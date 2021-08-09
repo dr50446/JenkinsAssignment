@@ -28,6 +28,7 @@ pipeline {
 
                     holidaydates = jsonfile.response.holidays.date.iso.toString()
                     if(holidaydates.contains(date)) {
+                    	echo 'Today is a holiday.'
                         runflag = 'n'
                     }
                 }
@@ -57,10 +58,10 @@ pipeline {
                     stages{
                         stage('Static check') {
                             when{
-                                expression{
-                                    runflag == 'y'
-                                    return params.Static_Check
-                                }
+                                allOf{
+                                expression{return params.Static_Check}
+                                expression{runflag == 'y'}
+                            	}
                             }
                             steps {
                                 script{
@@ -75,9 +76,9 @@ pipeline {
                         }
                         stage('QA') {
                             when{
-                                expression {
-                                    runflag == 'y'
-                                    return params.QA
+                            	allOf{
+                                expression{return params.QA}
+                                expression{runflag == 'y'}
                                 }
                             }
                             steps {
@@ -92,9 +93,9 @@ pipeline {
                 }
                 stage('Unit test') {
                     when{
-                        expression {
-                        runflag == 'y'
-                        return params.Unit_Test
+                        allOf{
+                        expression{return params.Unit_Test}
+                        expression{runflag == 'y'}
                         }
                     }
                     steps {
